@@ -63,6 +63,16 @@ namespace CNPHomework.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CNP_Final_Homework_Map {
+            get {
+                object obj = ResourceManager.GetObject("CNP Final Homework Map", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap CNP_Homework_Map {
             get {
                 object obj = ResourceManager.GetObject("CNP Homework Map", resourceCulture);

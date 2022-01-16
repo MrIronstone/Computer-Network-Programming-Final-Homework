@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.ConnectButton = new System.Windows.Forms.Button();
             this.ListenButton = new System.Windows.Forms.Button();
             this.SendButton = new System.Windows.Forms.Button();
@@ -40,76 +41,56 @@
             // 
             // ConnectButton
             // 
-            this.ConnectButton.Location = new System.Drawing.Point(746, 12);
+            resources.ApplyResources(this.ConnectButton, "ConnectButton");
             this.ConnectButton.Name = "ConnectButton";
-            this.ConnectButton.Size = new System.Drawing.Size(75, 23);
-            this.ConnectButton.TabIndex = 0;
-            this.ConnectButton.Text = "Connect";
             this.ConnectButton.UseVisualStyleBackColor = true;
             this.ConnectButton.Click += new System.EventHandler(this.ConnectButton_Click);
             // 
             // ListenButton
             // 
-            this.ListenButton.Location = new System.Drawing.Point(662, 55);
+            resources.ApplyResources(this.ListenButton, "ListenButton");
             this.ListenButton.Name = "ListenButton";
-            this.ListenButton.Size = new System.Drawing.Size(75, 23);
-            this.ListenButton.TabIndex = 1;
-            this.ListenButton.Text = "Listen";
             this.ListenButton.UseVisualStyleBackColor = true;
             this.ListenButton.Click += new System.EventHandler(this.ListenButton_Click);
             // 
             // SendButton
             // 
-            this.SendButton.Location = new System.Drawing.Point(746, 55);
+            resources.ApplyResources(this.SendButton, "SendButton");
             this.SendButton.Name = "SendButton";
-            this.SendButton.Size = new System.Drawing.Size(75, 23);
-            this.SendButton.TabIndex = 2;
-            this.SendButton.Text = "Send";
             this.SendButton.UseVisualStyleBackColor = true;
             this.SendButton.Click += new System.EventHandler(this.SendButton_Click);
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(659, 90);
+            resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(111, 17);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Enter text string:";
             // 
             // newText
             // 
-            this.newText.Location = new System.Drawing.Point(662, 110);
+            resources.ApplyResources(this.newText, "newText");
             this.newText.Name = "newText";
-            this.newText.Size = new System.Drawing.Size(159, 20);
-            this.newText.TabIndex = 4;
             // 
             // results
             // 
-            this.results.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            resources.ApplyResources(this.results, "results");
+            this.results.BackColor = System.Drawing.SystemColors.Window;
+            this.results.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.results.FormattingEnabled = true;
-            this.results.ItemHeight = 16;
-            this.results.Location = new System.Drawing.Point(662, 136);
             this.results.Name = "results";
-            this.results.Size = new System.Drawing.Size(159, 164);
-            this.results.TabIndex = 5;
             // 
             // Map
             // 
+            resources.ApplyResources(this.Map, "Map");
             this.Map.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.Map.Image = global::CNPHomework.Properties.Resources.CNP_Homework_Map;
-            this.Map.Location = new System.Drawing.Point(0, 0);
+            this.Map.Image = global::CNPHomework.Properties.Resources.CNP_Final_Homework_Map;
             this.Map.Name = "Map";
-            this.Map.Size = new System.Drawing.Size(613, 302);
-            this.Map.TabIndex = 6;
             this.Map.TabStop = false;
+            this.Map.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Map_MouseDown);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(833, 305);
+            resources.ApplyResources(this, "$this");
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.Map);
             this.Controls.Add(this.results);
             this.Controls.Add(this.newText);
@@ -118,12 +99,10 @@
             this.Controls.Add(this.ListenButton);
             this.Controls.Add(this.ConnectButton);
             this.Name = "Form1";
-            this.Text = "CNP GAME";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.Map)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
 
         }
 
@@ -136,6 +115,7 @@
         private System.Windows.Forms.TextBox newText;
         private System.Windows.Forms.ListBox results;
         private System.Windows.Forms.PictureBox Map;
+        private System.Drawing.Bitmap mapBitMap;
     }
 }
 

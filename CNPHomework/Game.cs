@@ -12,32 +12,6 @@ namespace CNPHomework
         private static int maxFlagNumber = 10;
         private Flag[] flags = new Flag[maxFlagNumber];
 
-        private bool isPrepartionPhase = true;
-        private bool isGuessingPhase = false;
-
-        Game()
-        {
-            Player player1 = new Player();
-            Player player2 = new Player();
-        }
-
-    }
-    class Player
-    {
-        private int id { get; set; }
-        private static int maxFlagNumberPerPlayer = 5;
-        public int currentFlagNumber = 0;
-        private Flag[] flags = new Flag[maxFlagNumberPerPlayer];
-
-        public void SewFlag(int x, int y)
-        {
-            if(currentFlagNumber < maxFlagNumberPerPlayer)
-            {
-                Flag newFlag = new Flag(x, y);
-                currentFlagNumber += 1;
-                flags[currentFlagNumber - 1] = newFlag;
-            }
-        }
 
     }
     class Flag
