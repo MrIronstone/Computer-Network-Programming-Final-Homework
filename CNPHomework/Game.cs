@@ -11,6 +11,16 @@ namespace CNPHomework
         private static int maxPlayer = 2;
         private static int maxFlagNumber = 10;
         private Flag[] flags = new Flag[maxFlagNumber];
+
+        private bool isPrepartionPhase = true;
+        private bool isGuessingPhase = false;
+
+        Game()
+        {
+            Player player1 = new Player();
+            Player player2 = new Player();
+        }
+
     }
     class Player
     {
