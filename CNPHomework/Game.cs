@@ -28,9 +28,9 @@ namespace CNPHomework
             this.anchorPointX = anchorPointX;
             this.anchorPointY = anchorPointY;
 
-            Coordinate startPoint = new Coordinate(anchorPointX - 7, anchorPointY +7);
-
-            flagAreaCoordinates = new Coordinate[15,15];
+            Coordinate startPoint = new Coordinate(anchorPointX - 50, anchorPointY + 50);
+            
+            flagAreaCoordinates = new Coordinate[101,101];
             for (int i = 0; i < flagAreaCoordinates.GetLength(0); i++)
             {
                 for (int j = 0; j < flagAreaCoordinates.GetLength(1); j++)
@@ -38,6 +38,11 @@ namespace CNPHomework
                     flagAreaCoordinates[i, j] = new Coordinate( startPoint.getX() + i, startPoint.getY() + j);
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            return anchorPointX.ToString() + ", " + anchorPointY.ToString();
         }
     }
 

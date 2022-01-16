@@ -31,6 +31,13 @@ namespace CNPHomework
                 currentFlagNumber += 1;
                 flags[currentFlagNumber - 1] = newFlag;
                 results.Items.Add(String.Format("New Flag has been sewed.\r It's coordinates are: X={0}, Y={1}", x, y));
+                ListBoxOfSewedFlags.Items.Add(newFlag.ToString());
+                FlagsLeftToSewTextBox.Text = (maxFlagNumberPerPlayer - currentFlagNumber).ToString();
+
+                if(currentFlagNumber == maxFlagNumberPerPlayer)
+                {
+                    SendButton.Enabled = true;
+                }
             }
         }
 
@@ -82,6 +89,8 @@ namespace CNPHomework
                 newText.Clear();
                 client.BeginSend(message, 0, message.Length, 0,
                 new AsyncCallback(SendData), client);
+
+
             }
             catch (Exception ex)
             {
@@ -114,6 +123,8 @@ namespace CNPHomework
                 results.Items.Add("Connected to: " + client.RemoteEndPoint.ToString());
                 Thread receiver = new Thread(new ThreadStart(ReceiveData));
                 receiver.Start();
+                ListenButton.Enabled = false;
+                ConnectButton.Enabled = false;
             }
             catch (SocketException)
             {
@@ -166,6 +177,11 @@ namespace CNPHomework
         public Form1()
         {
             InitializeComponent();
+
+            FlagsLeftToSewTextBox.Text = (maxFlagNumberPerPlayer - currentFlagNumber).ToString();
+
+            SendButton.Enabled = false;
+
             Control.CheckForIllegalCrossThreadCalls = false;
         }
 
@@ -189,12 +205,25 @@ namespace CNPHomework
             ButtonListenOnClick(sender, e); 
         }
 
-        private void Map_MouseDown(object sender, MouseEventArgs e)
+        private void pictureBoxOfMap_MouseDown(object sender, MouseEventArgs e)
         {
-            Image b = Map.Image;
-            int x = b.Width * e.X / Map.Width;
-            int y = b.Height * e.Y / Map.Height;
-            SewFlag(x, y);
+            try
+            {
+                Image b = pictureBoxOfMap.Image;
+                int x = b.Width * e.X / pictureBoxOfMap.Width;
+                int y = b.Height * e.Y / pictureBoxOfMap.Height;
+                SewFlag(x, y);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error While Trying to Sew Flag");
+            }
         }
+
+        //private byte[] ConvertObjectIntoByteArray(object model)
+        //{
+        //    return Convert.ToByte();
+        //}
+
     }
 }
