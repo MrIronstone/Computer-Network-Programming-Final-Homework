@@ -12,6 +12,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
+using System.Diagnostics;
+
 namespace CNPHomework
 {
     public partial class Form1 : Form
@@ -23,20 +25,30 @@ namespace CNPHomework
         public int currentFlagNumber = 0;
         private Flag[] flags = new Flag[maxFlagNumberPerPlayer];
 
-        public void SewFlag(int x, int y)
+        private bool isHost = false;
+        private bool isYourTurn = false;
+        private bool AttackPhase = false;
+        private bool SewFlagPhase = true;
+
+        private void SewFlag(int x, int y)
         {
+            // eğer yerleştirilen bayrak sayısı, maksimum izin verilen bayrak sayısından az ise
+            // bayrak dikmeye izin veren if sorgusu
             if (currentFlagNumber < maxFlagNumberPerPlayer)
             {
                 Flag newFlag = new Flag(x, y);
+                
                 currentFlagNumber += 1;
                 flags[currentFlagNumber - 1] = newFlag;
-                results.Items.Add(String.Format("New Flag has been sewed.\r It's coordinates are: X={0}, Y={1}", x, y));
+                results.Items.Add(String.Format("New Flag has been sewed. It's coordinates are: X={0}, Y={1}", x, y));
                 ListBoxOfSewedFlags.Items.Add(newFlag.ToString());
                 FlagsLeftToSewTextBox.Text = (maxFlagNumberPerPlayer - currentFlagNumber).ToString();
 
-                if(currentFlagNumber == maxFlagNumberPerPlayer)
+                // eğer dikilen bayrak sayısı, maksimum izin verilen bayrak sayısına ulaşırsa
+                // ready tuşunu aktive etmeyi sağlayan if sorgusu
+                if ((currentFlagNumber == maxFlagNumberPerPlayer) && isYourTurn)
                 {
-                    SendButton.Enabled = true;
+                    ReadyButton.Enabled = true;
                 }
             }
         }
@@ -56,47 +68,28 @@ namespace CNPHomework
                 newsock.Bind(iep);
                 newsock.Listen(5);
                 newsock.BeginAccept(new AsyncCallback(AcceptConn), newsock);
-            }
-            catch (Exception)
-            {
-                results.Items.Add("Error on listen on click button");
-            }
-            
-        }
-        void ButtonConnectOnClick(object obj, EventArgs ea)
-        {
-            try
-            {
-                results.Items.Add("Connecting...");
-                client = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
-                ProtocolType.Tcp);
-                IPEndPoint iep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 9050);
-                client.BeginConnect(iep, new AsyncCallback(Connected), client);
                 
             }
             catch (Exception ex)
             {
-                results.Items.Add("Error on the connect on click button");
+                results.Items.Add("Error on listen on click button");
+                MessageBox.Show(ex.ToString());
             }
-
             
         }
-        void ButtonSendOnClick(object obj, EventArgs ea)
+
+        void SkipTurn()
         {
             try
             {
-                byte[] message = Encoding.ASCII.GetBytes(newText.Text);
-                newText.Clear();
+                byte[] message = Encoding.ASCII.GetBytes("Your Turn!");
                 client.BeginSend(message, 0, message.Length, 0,
                 new AsyncCallback(SendData), client);
-
-
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                results.Items.Add("Error on sending the data on button click");
+                results.Items.Add("Error on skipping the turn");
             }
-            
         }
         void AcceptConn(IAsyncResult iar)
         {
@@ -107,8 +100,13 @@ namespace CNPHomework
                 results.Items.Add("Connection from: " + client.RemoteEndPoint.ToString());
                 Thread receiver = new Thread(new ThreadStart(ReceiveData));
                 receiver.Start();
+                // bir kere listen'a bastıktan sonra tuşu deaktive edebilmek için
+                ListenButton.Enabled = false;
+                ConnectButton.Enabled = false;
+                isYourTurn = true;
+                TurnLabel.Text = "Your Turn!";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 results.Items.Add("Error accepting the connection");   
@@ -125,6 +123,8 @@ namespace CNPHomework
                 receiver.Start();
                 ListenButton.Enabled = false;
                 ConnectButton.Enabled = false;
+                isYourTurn = false;
+                TurnLabel.Text = "Enemy Turn";
             }
             catch (SocketException)
             {
@@ -138,7 +138,7 @@ namespace CNPHomework
                 Socket remote = (Socket)iar.AsyncState;
                 int sent = remote.EndSend(iar);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 results.Items.Add("Error on sending the data");
@@ -155,8 +155,36 @@ namespace CNPHomework
                 {
                     recv = client.Receive(data);
                     stringData = Encoding.ASCII.GetString(data, 0, recv);
+                    // bize bye gelirse bağlantı koptu demektir
                     if (stringData == "bye")
                         break;
+                    // Your Turn! gelirse sıra bize geçti demektir
+                    else if (stringData == "Your Turn!")
+                    {
+                        TurnLabel.Text = "Your Turn!";
+                        isYourTurn = true;
+                        // bu oyuncuyunun sırası gelecek şekilde ayarlamalıyım
+                        if (SewFlagPhase = true && AttackPhase == false)
+                        {
+                            if(currentFlagNumber == maxFlagNumberPerPlayer)
+                            {
+                                ReadyButton.Enabled = true;
+                            }
+                        }
+                        else if (AttackPhase == true && SewFlagPhase == false)
+                        {
+                            AttackText.Enabled = true;
+                            AttackText.Text = "Select Location to Attack!";
+
+                        }
+                        //
+                    }
+                    else if (stringData.StartsWith("Attack Location: "))
+                    {
+                        string attackLoc = stringData.Substring(stringData.IndexOf("Attack Location: "));
+                        MessageBox.Show(attackLoc);
+                        // Flag attackLocation = Flag()
+                    }
                     results.Items.Add(stringData);
                 }
                 stringData = "bye";
@@ -164,11 +192,12 @@ namespace CNPHomework
                 client.Send(message);
                 client.Close();
                 results.Items.Add("Connection stopped");
+                ListenButton.Enabled = true;
+                ConnectButton.Enabled = true;
                 return;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
                 results.Items.Add("Error on receiving the data");
             }
             
@@ -180,19 +209,22 @@ namespace CNPHomework
 
             FlagsLeftToSewTextBox.Text = (maxFlagNumberPerPlayer - currentFlagNumber).ToString();
 
-            SendButton.Enabled = false;
+            ReadyButton.Enabled = false;
+            AttackButton.Enabled = false;
+            AttackText.Enabled = false;
+            TurnLabel.Text = "Game hasn't started yet!";
 
             Control.CheckForIllegalCrossThreadCalls = false;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        void ButtonConnectOnClick(object obj, EventArgs ea)
         {
-
-        }
-
-        private void SendButton_Click(object sender, EventArgs e)
-        {
-            ButtonSendOnClick(sender, e);
+            results.Items.Add("Connecting...");
+            client = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
+            ProtocolType.Tcp);
+            IPEndPoint iep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 9050);
+            client.BeginConnect(iep, new AsyncCallback(Connected), client);
+            
         }
 
         private void ConnectButton_Click(object sender, EventArgs e)
@@ -202,8 +234,9 @@ namespace CNPHomework
 
         private void ListenButton_Click(object sender, EventArgs e)
         {
-            ButtonListenOnClick(sender, e); 
+            ButtonListenOnClick(sender, e);
         }
+
 
         private void pictureBoxOfMap_MouseDown(object sender, MouseEventArgs e)
         {
@@ -212,18 +245,86 @@ namespace CNPHomework
                 Image b = pictureBoxOfMap.Image;
                 int x = b.Width * e.X / pictureBoxOfMap.Width;
                 int y = b.Height * e.Y / pictureBoxOfMap.Height;
-                SewFlag(x, y);
+                if ( SewFlagPhase = true && AttackPhase == false)
+                {
+                    SewFlag(x, y);
+                }
+                else if (AttackPhase == true && SewFlagPhase == false && AttackText.Enabled == true)
+                {
+                    AttackText.Text = String.Format("X={0}, Y={1}", x, y);
+                }
+
             }
             catch (Exception)
             {
-                MessageBox.Show("Error While Trying to Sew Flag");
+                results.Items.Add("Error on map picture click");
             }
         }
 
-        //private byte[] ConvertObjectIntoByteArray(object model)
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ReadyButton_Click(object sender, EventArgs e)
+        {
+            TurnLabel.Text = "Enemy Turn";
+            SewFlagPhase = false;
+            AttackPhase = true;
+            ReadyButton.Enabled = false;
+            SkipTurn();
+        }
+
+        private void AttackButton_Click(object sender, EventArgs e)
+        {
+            AttackButton.Enabled = false;
+            SendAttackLocations();
+            TurnLabel.Text = "Enemy Turn";
+            SkipTurn();
+        }
+
+        private void SendAttackLocations()
+        {
+            try
+            {
+                string attackLocation = "Attack Location: " + AttackText.Text;
+                byte[] message = Encoding.ASCII.GetBytes(attackLocation);
+                client.BeginSend(message, 0, message.Length, 0,
+                new AsyncCallback(SendData), client);
+                results.Items.Add("You attacked to: " + AttackText.Text);
+            }
+            catch (Exception)
+            {
+                results.Items.Add("Error on sending the attack locations");
+            }
+        }
+
+        private void AttackButton_TextChanged(object sender, EventArgs e)
+        {
+            // bu sayede attack text kısmına bir şey yazıldığında attack tuşu aktive olur
+            AttackButton.Enabled = true;
+        }
+
+
+        //private void AttackText_TextChanged(object sender, EventArgs e)
         //{
-        //    return Convert.ToByte();
+        //    AttackButton.Enabled = true;
         //}
 
+        public void GetHitToPosition(int x, int y)
+        {
+            Flag hitArea = new Flag(x, y);
+            int startPointXForArea = hitArea.flagAreaCoordinates.GetLength(0);
+            int startPointYForArea = hitArea.flagAreaCoordinates.GetLength(1);
+            for (int i = 0; i < startPointXForArea; i++)
+            {
+                for (int j = 0; j < startPointYForArea; j++)
+                {
+                    mapBitMap.SetPixel(i, j, Color.Black);
+                }
+            }
+
+
+        }
     }
 }

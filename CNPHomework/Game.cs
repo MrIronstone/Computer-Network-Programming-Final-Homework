@@ -16,21 +16,37 @@ namespace CNPHomework
     }
     class Flag
     {
-        private int id { get; set; }
+        private int size = 101;
+        public int getSize()
+        {
+            return this.size;
+        }
+        public void setSize(int newSize)
+        {
+            if(newSize > 0)
+            {
+                this.size = newSize;
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
+            }
+        }
+
 
         private int anchorPointX;
         private int anchorPointY;
 
-        private Coordinate[,] flagAreaCoordinates;
+        public Coordinate[,] flagAreaCoordinates;
 
         public Flag(int anchorPointX, int anchorPointY)
         {
             this.anchorPointX = anchorPointX;
             this.anchorPointY = anchorPointY;
 
-            Coordinate startPoint = new Coordinate(anchorPointX - 50, anchorPointY + 50);
+            Coordinate startPoint = new Coordinate(anchorPointX - 50, anchorPointY - 50);
             
-            flagAreaCoordinates = new Coordinate[101,101];
+            flagAreaCoordinates = new Coordinate[size, size];
             for (int i = 0; i < flagAreaCoordinates.GetLength(0); i++)
             {
                 for (int j = 0; j < flagAreaCoordinates.GetLength(1); j++)
