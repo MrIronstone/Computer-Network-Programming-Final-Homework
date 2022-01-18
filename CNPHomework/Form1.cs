@@ -25,11 +25,12 @@ namespace CNPHomework
         public int currentFlagNumber = 0;
         private Flag[] flags = new Flag[maxFlagNumberPerPlayer];
 
-        private bool isHost = false;
         private bool isYourTurn = false;
         private bool AttackPhase = false;
         private bool SewFlagPhase = true;
 
+        Socket newsock;
+        Thread receiver;
         private void SewFlag(int x, int y)
         {
             // eğer yerleştirilen bayrak sayısı, maksimum izin verilen bayrak sayısından az ise
@@ -62,7 +63,7 @@ namespace CNPHomework
             try
             {
                 results.Items.Add("Listening for a client...");
-                Socket newsock = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
+                newsock = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
                 ProtocolType.Tcp);
                 IPEndPoint iep = new IPEndPoint(IPAddress.Any, 9050);
                 newsock.Bind(iep);
@@ -98,7 +99,7 @@ namespace CNPHomework
                 Socket oldserver = (Socket)iar.AsyncState;
                 client = oldserver.EndAccept(iar);
                 results.Items.Add("Connection from: " + client.RemoteEndPoint.ToString());
-                Thread receiver = new Thread(new ThreadStart(ReceiveData));
+                receiver = new Thread(new ThreadStart(ReceiveData));
                 receiver.Start();
                 // bir kere listen'a bastıktan sonra tuşu deaktive edebilmek için
                 ListenButton.Enabled = false;
@@ -113,6 +114,8 @@ namespace CNPHomework
             }
             
         }
+
+        
         void Connected(IAsyncResult iar)
         {
             try
@@ -177,16 +180,31 @@ namespace CNPHomework
                             AttackText.Text = "Select Location to Attack!";
 
                         }
-                        //
+                        
                     }
                     else if (stringData.StartsWith("Attack Location: "))
                     {
-                        string attackLoc = stringData.Substring(stringData.IndexOf("Attack Location: "));
-                        MessageBox.Show(attackLoc);
-                        // Flag attackLocation = Flag()
+                        try
+                        {
+                            string attackLoc = stringData.Split(':')[1].Substring(1);
+                            
+                            int x = int.Parse(attackLoc.Split(',')[0].Split('=')[1]);
+                            int y = int.Parse(attackLoc.Split(',')[1].Split('=')[1]);
+
+                            MessageBox.Show(attackLoc + " and X: " + x + " , " + y );
+                            GetHitToPosition(x, y);
+
+                        }
+                        catch (Exception ex)
+                        {
+
+                            MessageBox.Show(ex.ToString());
+                        }
+
                     }
                     results.Items.Add(stringData);
                 }
+
                 stringData = "bye";
                 byte[] message = Encoding.ASCII.GetBytes(stringData);
                 client.Send(message);
@@ -194,6 +212,10 @@ namespace CNPHomework
                 results.Items.Add("Connection stopped");
                 ListenButton.Enabled = true;
                 ConnectButton.Enabled = true;
+                isYourTurn = false;
+                TurnLabel.Text = "Game hasn't started yet!";
+                AttackButton.Enabled = false;
+                currentFlagNumber = 0;
                 return;
             }
             catch (Exception)
@@ -214,7 +236,7 @@ namespace CNPHomework
             AttackText.Enabled = false;
             TurnLabel.Text = "Game hasn't started yet!";
 
-            Control.CheckForIllegalCrossThreadCalls = false;
+            // Control.CheckForIllegalCrossThreadCalls = false;
         }
 
         void ButtonConnectOnClick(object obj, EventArgs ea)
@@ -237,7 +259,6 @@ namespace CNPHomework
             ButtonListenOnClick(sender, e);
         }
 
-
         private void pictureBoxOfMap_MouseDown(object sender, MouseEventArgs e)
         {
             try
@@ -259,11 +280,6 @@ namespace CNPHomework
             {
                 results.Items.Add("Error on map picture click");
             }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
         }
 
         private void ReadyButton_Click(object sender, EventArgs e)
@@ -299,32 +315,57 @@ namespace CNPHomework
             }
         }
 
-        private void AttackButton_TextChanged(object sender, EventArgs e)
-        {
-            // bu sayede attack text kısmına bir şey yazıldığında attack tuşu aktive olur
-            AttackButton.Enabled = true;
-        }
-
-
-        //private void AttackText_TextChanged(object sender, EventArgs e)
-        //{
-        //    AttackButton.Enabled = true;
-        //}
-
         public void GetHitToPosition(int x, int y)
         {
             Flag hitArea = new Flag(x, y);
-            int startPointXForArea = hitArea.flagAreaCoordinates.GetLength(0);
-            int startPointYForArea = hitArea.flagAreaCoordinates.GetLength(1);
-            for (int i = 0; i < startPointXForArea; i++)
+            
+            // this double for loop iterates over the flag's coordinates
+            for (int i = 0; i < hitArea.flagAreaCoordinates.Length; i++)
             {
-                for (int j = 0; j < startPointYForArea; j++)
+                for (int j = 0; j < hitArea.flagAreaCoordinates.Length; j++)
                 {
-                    mapBitMap.SetPixel(i, j, Color.Black);
+                    // this line gets the coordinates info from the coordinate array and draw it to black
+                    try
+                    {
+                        mapBitMap.SetPixel(hitArea.flagAreaCoordinates[i, j].getX(), hitArea.flagAreaCoordinates[i, j].getX(), Color.Black);
+                    }
+                    catch (Exception)
+                    {
+
+                        MessageBox.Show("Error while drawing the picture");
+                    }
+                    
                 }
+                
             }
+        }
 
+        private void AttackText_TextChanged(object sender, EventArgs e)
+        {
+            if(AttackText.Text != "Select Location to Attack!")
+            {
+                AttackButton.Enabled = true;
+            }
+            
+        }
 
+        private void DisconnectButton_Click(object sender, EventArgs e)
+        {
+            if(client != null)
+            {
+                byte[] message = Encoding.ASCII.GetBytes("bye");
+                client.Send(message);
+            }
+            else
+            {
+                results.Items.Add("Client is null");
+            }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            byte[] message = Encoding.ASCII.GetBytes("bye");
+            client.Send(message);
         }
     }
 }
