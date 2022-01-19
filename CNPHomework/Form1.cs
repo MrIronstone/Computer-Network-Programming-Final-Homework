@@ -31,6 +31,7 @@ namespace CNPHomework
 
         Socket newsock;
         Thread receiver;
+        IPEndPoint iep;
         private void SewFlag(int x, int y)
         {
             // eğer yerleştirilen bayrak sayısı, maksimum izin verilen bayrak sayısından az ise
@@ -65,7 +66,7 @@ namespace CNPHomework
                 results.Items.Add("Listening for a client...");
                 newsock = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
                 ProtocolType.Tcp);
-                IPEndPoint iep = new IPEndPoint(IPAddress.Any, 9050);
+                iep = new IPEndPoint(IPAddress.Any, 9050);
                 newsock.Bind(iep);
                 newsock.Listen(5);
                 newsock.BeginAccept(new AsyncCallback(AcceptConn), newsock);
@@ -101,10 +102,12 @@ namespace CNPHomework
                 results.Items.Add("Connection from: " + client.RemoteEndPoint.ToString());
                 receiver = new Thread(new ThreadStart(ReceiveData));
                 receiver.Start();
-                // bir kere listen'a bastıktan sonra tuşu deaktive edebilmek için
+                // to deactive and active the appropriate buttons after connection has been accepted
                 ListenButton.Enabled = false;
                 ConnectButton.Enabled = false;
+                DisconnectButton.Enabled = true;
                 isYourTurn = true;
+
                 TurnLabel.Text = "Your Turn!";
             }
             catch (Exception)
@@ -124,8 +127,11 @@ namespace CNPHomework
                 results.Items.Add("Connected to: " + client.RemoteEndPoint.ToString());
                 Thread receiver = new Thread(new ThreadStart(ReceiveData));
                 receiver.Start();
+
+                // to deactive and active the appropriate buttons after connection has been accepted
                 ListenButton.Enabled = false;
                 ConnectButton.Enabled = false;
+                DisconnectButton.Enabled = true;
                 isYourTurn = false;
                 TurnLabel.Text = "Enemy Turn";
             }
@@ -205,6 +211,8 @@ namespace CNPHomework
                     results.Items.Add(stringData);
                 }
 
+
+                // disconnect
                 stringData = "bye";
                 byte[] message = Encoding.ASCII.GetBytes(stringData);
                 client.Send(message);
@@ -212,8 +220,14 @@ namespace CNPHomework
                 results.Items.Add("Connection stopped");
                 ListenButton.Enabled = true;
                 ConnectButton.Enabled = true;
+                DisconnectButton.Enabled = false;
                 isYourTurn = false;
                 TurnLabel.Text = "Game hasn't started yet!";
+
+                newsock.Shutdown(SocketShutdown.Both);
+                receiver.Abort();
+                
+
                 AttackButton.Enabled = false;
                 currentFlagNumber = 0;
                 return;
@@ -234,6 +248,7 @@ namespace CNPHomework
             ReadyButton.Enabled = false;
             AttackButton.Enabled = false;
             AttackText.Enabled = false;
+            DisconnectButton.Enabled = false;
             TurnLabel.Text = "Game hasn't started yet!";
 
             // Control.CheckForIllegalCrossThreadCalls = false;
@@ -355,10 +370,12 @@ namespace CNPHomework
             {
                 byte[] message = Encoding.ASCII.GetBytes("bye");
                 client.Send(message);
+                ConnectButton.Enabled = true;
+                ListenButton.Enabled = true;
             }
             else
             {
-                results.Items.Add("Client is null");
+                MessageBox.Show("Client is null");
             }
         }
 
