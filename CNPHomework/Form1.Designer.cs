@@ -45,13 +45,16 @@
             this.label2 = new System.Windows.Forms.Label();
             this.DisconnectButton = new System.Windows.Forms.Button();
             this.ClearResultsButton = new System.Windows.Forms.Button();
+            this.IpAdressOfEndPointTextBox = new System.Windows.Forms.TextBox();
+            this.localIpAdressTextBox = new System.Windows.Forms.TextBox();
+            this.localIpAdressLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxOfMap)).BeginInit();
             this.SuspendLayout();
             // 
             // ConnectButton
             // 
             this.ConnectButton.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.ConnectButton.Location = new System.Drawing.Point(697, 12);
+            this.ConnectButton.Location = new System.Drawing.Point(697, 61);
             this.ConnectButton.Name = "ConnectButton";
             this.ConnectButton.Size = new System.Drawing.Size(75, 23);
             this.ConnectButton.TabIndex = 0;
@@ -118,7 +121,7 @@
             // FlagsLeftToSewLabel
             // 
             this.FlagsLeftToSewLabel.AutoSize = true;
-            this.FlagsLeftToSewLabel.Location = new System.Drawing.Point(631, 84);
+            this.FlagsLeftToSewLabel.Location = new System.Drawing.Point(631, 149);
             this.FlagsLeftToSewLabel.Name = "FlagsLeftToSewLabel";
             this.FlagsLeftToSewLabel.Size = new System.Drawing.Size(93, 13);
             this.FlagsLeftToSewLabel.TabIndex = 7;
@@ -128,7 +131,7 @@
             // FlagsSewedLabel
             // 
             this.FlagsSewedLabel.AutoSize = true;
-            this.FlagsSewedLabel.Location = new System.Drawing.Point(631, 116);
+            this.FlagsSewedLabel.Location = new System.Drawing.Point(631, 181);
             this.FlagsSewedLabel.Name = "FlagsSewedLabel";
             this.FlagsSewedLabel.Size = new System.Drawing.Size(68, 13);
             this.FlagsSewedLabel.TabIndex = 8;
@@ -137,14 +140,14 @@
             // ListBoxOfSewedFlags
             // 
             this.ListBoxOfSewedFlags.FormattingEnabled = true;
-            this.ListBoxOfSewedFlags.Location = new System.Drawing.Point(634, 132);
+            this.ListBoxOfSewedFlags.Location = new System.Drawing.Point(634, 197);
             this.ListBoxOfSewedFlags.Name = "ListBoxOfSewedFlags";
             this.ListBoxOfSewedFlags.Size = new System.Drawing.Size(129, 95);
             this.ListBoxOfSewedFlags.TabIndex = 9;
             // 
             // FlagsLeftToSewTextBox
             // 
-            this.FlagsLeftToSewTextBox.Location = new System.Drawing.Point(730, 81);
+            this.FlagsLeftToSewTextBox.Location = new System.Drawing.Point(730, 146);
             this.FlagsLeftToSewTextBox.Name = "FlagsLeftToSewTextBox";
             this.FlagsLeftToSewTextBox.ReadOnly = true;
             this.FlagsLeftToSewTextBox.Size = new System.Drawing.Size(33, 20);
@@ -162,7 +165,7 @@
             // 
             // ReadyButton
             // 
-            this.ReadyButton.Location = new System.Drawing.Point(634, 233);
+            this.ReadyButton.Location = new System.Drawing.Point(634, 298);
             this.ReadyButton.Name = "ReadyButton";
             this.ReadyButton.Size = new System.Drawing.Size(129, 23);
             this.ReadyButton.TabIndex = 12;
@@ -190,7 +193,7 @@
             // 
             // DisconnectButton
             // 
-            this.DisconnectButton.Location = new System.Drawing.Point(660, 41);
+            this.DisconnectButton.Location = new System.Drawing.Point(697, 12);
             this.DisconnectButton.Name = "DisconnectButton";
             this.DisconnectButton.Size = new System.Drawing.Size(75, 23);
             this.DisconnectButton.TabIndex = 15;
@@ -208,11 +211,38 @@
             this.ClearResultsButton.UseVisualStyleBackColor = true;
             this.ClearResultsButton.Click += new System.EventHandler(this.ClearResultsButton_Click);
             // 
+            // IpAdressOfEndPointTextBox
+            // 
+            this.IpAdressOfEndPointTextBox.Location = new System.Drawing.Point(619, 63);
+            this.IpAdressOfEndPointTextBox.Name = "IpAdressOfEndPointTextBox";
+            this.IpAdressOfEndPointTextBox.Size = new System.Drawing.Size(72, 20);
+            this.IpAdressOfEndPointTextBox.TabIndex = 17;
+            // 
+            // localIpAdressTextBox
+            // 
+            this.localIpAdressTextBox.Location = new System.Drawing.Point(634, 120);
+            this.localIpAdressTextBox.Name = "localIpAdressTextBox";
+            this.localIpAdressTextBox.ReadOnly = true;
+            this.localIpAdressTextBox.Size = new System.Drawing.Size(129, 20);
+            this.localIpAdressTextBox.TabIndex = 18;
+            // 
+            // localIpAdressLabel
+            // 
+            this.localIpAdressLabel.AutoSize = true;
+            this.localIpAdressLabel.Location = new System.Drawing.Point(621, 104);
+            this.localIpAdressLabel.Name = "localIpAdressLabel";
+            this.localIpAdressLabel.Size = new System.Drawing.Size(151, 13);
+            this.localIpAdressLabel.TabIndex = 19;
+            this.localIpAdressLabel.Text = "This Device\'s Local IP Adress:";
+            // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(781, 501);
+            this.Controls.Add(this.localIpAdressLabel);
+            this.Controls.Add(this.localIpAdressTextBox);
+            this.Controls.Add(this.IpAdressOfEndPointTextBox);
             this.Controls.Add(this.ClearResultsButton);
             this.Controls.Add(this.DisconnectButton);
             this.Controls.Add(this.label2);
@@ -259,6 +289,9 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button DisconnectButton;
         private System.Windows.Forms.Button ClearResultsButton;
+        private System.Windows.Forms.TextBox IpAdressOfEndPointTextBox;
+        private System.Windows.Forms.TextBox localIpAdressTextBox;
+        private System.Windows.Forms.Label localIpAdressLabel;
     }
 }
 

@@ -20,9 +20,9 @@ namespace CNPHomework
     {
         private static Socket client;
         private static byte[] data = new byte[1024];
-        Socket newsock;
-        Thread receiver;
-        IPEndPoint iep;
+        private static Socket newsock;
+        private static Thread receiver;
+        private static IPEndPoint iep;
 
         private static int maxFlagNumberPerPlayer = 5;
         public int currentFlagNumber = 0;
@@ -71,7 +71,7 @@ namespace CNPHomework
                 ProtocolType.Tcp);
                 iep = new IPEndPoint(IPAddress.Any, 9050);
                 newsock.Bind(iep);
-                newsock.Listen(1);
+                newsock.Listen(5);
                 newsock.BeginAccept(new AsyncCallback(AcceptConn), newsock);
                 
             }
@@ -126,6 +126,7 @@ namespace CNPHomework
                 DisconnectButton.Enabled = true;
                 isYourTurn = false;
                 TurnLabel.Text = "Enemy Turn";
+                IpAdressOfEndPointTextBox.ReadOnly = true;
             }
             catch (SocketException)
             {
@@ -157,13 +158,12 @@ namespace CNPHomework
                     recv = client.Receive(data);
                     stringData = Encoding.ASCII.GetString(data, 0, recv);
 
-
-                    // bize bye gelirse bağlantı koptu demektir
+                    // if received string is "bye", it means it's our turn to disconnect and close
+                    // so we end the while loop and run the remaning codes outside the while loop
                     if (stringData == "bye")
                         break;
 
-
-                    // Your Turn! gelirse sıra bize geçti demektir
+                    // if received string is "Your Turn!", it means it's our turn
                     else if (stringData == "Your Turn!")
                     {
                         TurnLabel.Text = "Your Turn!";
@@ -225,9 +225,16 @@ namespace CNPHomework
 
             ReadyButton.Enabled = false;
             AttackButton.Enabled = false;
-            AttackText.Enabled = false;
+            AttackText.Enabled = falseA
             DisconnectButton.Enabled = false;
             TurnLabel.Text = "Game hasn't started yet!";
+            IpAdressOfEndPointTextBox.Text = "127.0.0.1";
+            localIpAdressTextBox.Text = 
+                Dns.GetHostEntry(Dns.GetHostName())
+                .AddressList
+                .First(x => x.AddressFamily == System.Net.Sockets
+                .AddressFamily.InterNetwork)
+                .ToString();
 
             Control.CheckForIllegalCrossThreadCalls = false;
         }
@@ -237,7 +244,7 @@ namespace CNPHomework
             results.Items.Add("Connecting...");
             client = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
             ProtocolType.Tcp);
-            IPEndPoint iep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 9050);
+            IPEndPoint iep = new IPEndPoint(IPAddress.Parse(IpAdressOfEndPointTextBox.Text), 9050);
             client.BeginConnect(iep, new AsyncCallback(Connected), client);
             
         }
@@ -376,18 +383,22 @@ namespace CNPHomework
 
         private void Disconnect()
         {
-            
-            string stringData = "bye";
-            byte[] message = Encoding.ASCII.GetBytes(stringData);
-            client.Send(message);
-            client.Close();
+            // if client is not null
+            if(client.Connected)
+            {
+                string stringData = "bye";
+                byte[] message = Encoding.ASCII.GetBytes(stringData);
+                client.Send(message);
+                client.Close();
+            }
             results.Items.Add("Connection stopped");
 
             // to enable the buttons
             ListenButton.Enabled = true;
             ConnectButton.Enabled = true;
+            IpAdressOfEndPointTextBox.ReadOnly = false;
 
-            // to enable the button that can close the connection
+            // to disable the button that can close the connection
             DisconnectButton.Enabled = false;
             AttackButton.Enabled = false;
 
@@ -397,15 +408,13 @@ namespace CNPHomework
             TurnLabel.Text = "Game hasn't started yet!";
 
 
-            //if (!newsock.Connected)
-            //{
-            //    newsock.Close();
-            //}
 
-            //if (!receiver.IsAlive)
-            //{
-            //    receiver.Abort();
-            //}
+            // close the socket if it's not closed
+            if (newsock != null)
+            {
+                newsock.Close();
+            }
+
         }
 
         private void LoseGame()
@@ -415,8 +424,6 @@ namespace CNPHomework
             results.Items.Add("YOU LOST THE GAME!");
             Disconnect();
         }
-
-
 
     }
 }
