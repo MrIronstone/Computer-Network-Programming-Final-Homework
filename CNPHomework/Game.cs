@@ -8,6 +8,7 @@ namespace CNPHomework
 {
     internal class Game
     {
+        private bool isThisFlagCaptured = false;
         private static int maxPlayer = 2;
         private static int maxFlagNumber = 10;
         private Flag[] flags = new Flag[maxFlagNumber];
@@ -16,44 +17,58 @@ namespace CNPHomework
     }
     class Flag
     {
-        private int size = 101;
-        public int getSize()
-        {
-            return this.size;
-        }
-        public void setSize(int newSize)
-        {
-            if(newSize > 0)
-            {
-                this.size = newSize;
-            }
-            else
-            {
-                throw new IndexOutOfRangeException();
-            }
-        }
+        //private int size = 101;
+        //public int getSize()
+        //{
+        //    return this.size;
+        //}
+        //public void setSize(int newSize)
+        //{
+        //    if(newSize > 0)
+        //    {
+        //        this.size = newSize;
+        //    }
+        //    else
+        //    {
+        //        throw new IndexOutOfRangeException();
+        //    }
+        //}
 
-
+        public bool isCaptured = false;
         private int anchorPointX;
         private int anchorPointY;
 
-        public Coordinate[,] flagAreaCoordinates;
+        // public Coordinate[,] flagAreaCoordinates;
 
         public Flag(int anchorPointX, int anchorPointY)
         {
             this.anchorPointX = anchorPointX;
             this.anchorPointY = anchorPointY;
 
-            Coordinate startPoint = new Coordinate(anchorPointX - 50, anchorPointY - 50);
+            //Coordinate startPoint = new Coordinate(anchorPointX - 50, anchorPointY - 50);
             
-            flagAreaCoordinates = new Coordinate[size, size];
-            for (int i = 0; i < flagAreaCoordinates.GetLength(0); i++)
+            //flagAreaCoordinates = new Coordinate[size, size];
+            //for (int i = 0; i < flagAreaCoordinates.GetLength(0); i++)
+            //{
+            //    for (int j = 0; j < flagAreaCoordinates.GetLength(1); j++)
+            //    {
+            //        flagAreaCoordinates[i, j] = new Coordinate( startPoint.getX() + i, startPoint.getY() + j);
+            //    }
+            //}
+        }
+        
+        public bool isThisAttackInMyArea(Flag hitArea)
+        {
+            // this method checks if the flag that has been given by paramater
+            if(this.anchorPointX - 50 <= hitArea.anchorPointX + 50 && this.anchorPointX + 50 >= hitArea.anchorPointX - 50)
             {
-                for (int j = 0; j < flagAreaCoordinates.GetLength(1); j++)
+                if(this.anchorPointY - 50 <= hitArea.anchorPointY + 50 && this.anchorPointY + 50 >= hitArea.anchorPointY - 50)
                 {
-                    flagAreaCoordinates[i, j] = new Coordinate( startPoint.getX() + i, startPoint.getY() + j);
+                    isCaptured = true;
+                    return true;
                 }
             }
+            return false;
         }
 
         public override string ToString()
@@ -62,6 +77,7 @@ namespace CNPHomework
         }
     }
 
+    /*
     class Coordinate
     {
         private int x;
@@ -84,4 +100,5 @@ namespace CNPHomework
             this.y = y;
         }
     }
+    */
 }

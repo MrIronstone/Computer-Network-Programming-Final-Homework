@@ -44,6 +44,7 @@
             this.TurnLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.DisconnectButton = new System.Windows.Forms.Button();
+            this.ClearResultsButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxOfMap)).BeginInit();
             this.SuspendLayout();
             // 
@@ -74,7 +75,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
             this.label1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label1.Location = new System.Drawing.Point(631, 290);
+            this.label1.Location = new System.Drawing.Point(631, 376);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(124, 13);
             this.label1.TabIndex = 3;
@@ -82,7 +83,7 @@
             // 
             // AttackText
             // 
-            this.AttackText.Location = new System.Drawing.Point(634, 319);
+            this.AttackText.Location = new System.Drawing.Point(634, 405);
             this.AttackText.Name = "AttackText";
             this.AttackText.ReadOnly = true;
             this.AttackText.Size = new System.Drawing.Size(129, 20);
@@ -98,7 +99,7 @@
             this.results.ItemHeight = 16;
             this.results.Location = new System.Drawing.Point(0, 303);
             this.results.Name = "results";
-            this.results.Size = new System.Drawing.Size(608, 96);
+            this.results.Size = new System.Drawing.Size(608, 192);
             this.results.TabIndex = 5;
             // 
             // pictureBoxOfMap
@@ -151,7 +152,7 @@
             // 
             // AttackButton
             // 
-            this.AttackButton.Location = new System.Drawing.Point(634, 345);
+            this.AttackButton.Location = new System.Drawing.Point(634, 431);
             this.AttackButton.Name = "AttackButton";
             this.AttackButton.Size = new System.Drawing.Size(129, 23);
             this.AttackButton.TabIndex = 11;
@@ -172,7 +173,7 @@
             // TurnLabel
             // 
             this.TurnLabel.AutoSize = true;
-            this.TurnLabel.Location = new System.Drawing.Point(631, 386);
+            this.TurnLabel.Location = new System.Drawing.Point(631, 472);
             this.TurnLabel.Name = "TurnLabel";
             this.TurnLabel.Size = new System.Drawing.Size(57, 13);
             this.TurnLabel.TabIndex = 13;
@@ -181,7 +182,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(631, 303);
+            this.label2.Location = new System.Drawing.Point(631, 389);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(81, 13);
             this.label2.TabIndex = 14;
@@ -197,11 +198,22 @@
             this.DisconnectButton.UseVisualStyleBackColor = true;
             this.DisconnectButton.Click += new System.EventHandler(this.DisconnectButton_Click);
             // 
+            // ClearResultsButton
+            // 
+            this.ClearResultsButton.Location = new System.Drawing.Point(533, 303);
+            this.ClearResultsButton.Name = "ClearResultsButton";
+            this.ClearResultsButton.Size = new System.Drawing.Size(75, 23);
+            this.ClearResultsButton.TabIndex = 16;
+            this.ClearResultsButton.Text = "Clear";
+            this.ClearResultsButton.UseVisualStyleBackColor = true;
+            this.ClearResultsButton.Click += new System.EventHandler(this.ClearResultsButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(781, 411);
+            this.ClientSize = new System.Drawing.Size(781, 501);
+            this.Controls.Add(this.ClearResultsButton);
             this.Controls.Add(this.DisconnectButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.TurnLabel);
@@ -217,10 +229,11 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.ListenButton);
             this.Controls.Add(this.ConnectButton);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Computer Network Programming Final Homework";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxOfMap)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -245,6 +258,7 @@
         private System.Windows.Forms.Label TurnLabel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button DisconnectButton;
+        private System.Windows.Forms.Button ClearResultsButton;
     }
 }
 

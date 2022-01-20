@@ -20,6 +20,9 @@ namespace CNPHomework
     {
         private static Socket client;
         private static byte[] data = new byte[1024];
+        Socket newsock;
+        Thread receiver;
+        IPEndPoint iep;
 
         private static int maxFlagNumberPerPlayer = 5;
         public int currentFlagNumber = 0;
@@ -29,9 +32,6 @@ namespace CNPHomework
         private bool AttackPhase = false;
         private bool SewFlagPhase = true;
 
-        Socket newsock;
-        Thread receiver;
-        IPEndPoint iep;
         private void SewFlag(int x, int y)
         {
             // eğer yerleştirilen bayrak sayısı, maksimum izin verilen bayrak sayısından az ise
@@ -63,36 +63,29 @@ namespace CNPHomework
         {
             try
             {
+                ListenButton.Enabled = false;
+                ConnectButton.Enabled = false;
                 results.Items.Add("Listening for a client...");
+                ConnectButton.Enabled = false;
                 newsock = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
                 ProtocolType.Tcp);
                 iep = new IPEndPoint(IPAddress.Any, 9050);
                 newsock.Bind(iep);
-                newsock.Listen(5);
+                newsock.Listen(1);
                 newsock.BeginAccept(new AsyncCallback(AcceptConn), newsock);
                 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 results.Items.Add("Error on listen on click button");
-                MessageBox.Show(ex.ToString());
+                // if error occurs enable back the connect button
+                ListenButton.Enabled = true;
+                ConnectButton.Enabled = true;
             }
             
         }
 
-        void SkipTurn()
-        {
-            try
-            {
-                byte[] message = Encoding.ASCII.GetBytes("Your Turn!");
-                client.BeginSend(message, 0, message.Length, 0,
-                new AsyncCallback(SendData), client);
-            }
-            catch (Exception)
-            {
-                results.Items.Add("Error on skipping the turn");
-            }
-        }
+        
         void AcceptConn(IAsyncResult iar)
         {
             try
@@ -102,9 +95,8 @@ namespace CNPHomework
                 results.Items.Add("Connection from: " + client.RemoteEndPoint.ToString());
                 receiver = new Thread(new ThreadStart(ReceiveData));
                 receiver.Start();
-                // to deactive and active the appropriate buttons after connection has been accepted
-                ListenButton.Enabled = false;
-                ConnectButton.Enabled = false;
+
+                // active the appropriate button after connection has been accepted
                 DisconnectButton.Enabled = true;
                 isYourTurn = true;
 
@@ -164,17 +156,23 @@ namespace CNPHomework
                 {
                     recv = client.Receive(data);
                     stringData = Encoding.ASCII.GetString(data, 0, recv);
+
+
                     // bize bye gelirse bağlantı koptu demektir
                     if (stringData == "bye")
                         break;
+
+
                     // Your Turn! gelirse sıra bize geçti demektir
                     else if (stringData == "Your Turn!")
                     {
                         TurnLabel.Text = "Your Turn!";
                         isYourTurn = true;
+
                         // bu oyuncuyunun sırası gelecek şekilde ayarlamalıyım
                         if (SewFlagPhase = true && AttackPhase == false)
                         {
+
                             if(currentFlagNumber == maxFlagNumberPerPlayer)
                             {
                                 ReadyButton.Enabled = true;
@@ -190,46 +188,26 @@ namespace CNPHomework
                     }
                     else if (stringData.StartsWith("Attack Location: "))
                     {
-                        try
-                        {
-                            string attackLoc = stringData.Split(':')[1].Substring(1);
+                        string attackLoc = stringData.Split(':')[1].Substring(1);
                             
-                            int x = int.Parse(attackLoc.Split(',')[0].Split('=')[1]);
-                            int y = int.Parse(attackLoc.Split(',')[1].Split('=')[1]);
+                        int x = int.Parse(attackLoc.Split(',')[0].Split('=')[1]);
+                        int y = int.Parse(attackLoc.Split(',')[1].Split('=')[1]);
 
-                            MessageBox.Show(attackLoc + " and X: " + x + " , " + y );
-                            GetHitToPosition(x, y);
+                        stringData = "Attack Received! " + stringData;
 
-                        }
-                        catch (Exception ex)
-                        {
-
-                            MessageBox.Show(ex.ToString());
-                        }
-
+                        GetHitToPosition(x, y);
+                        
                     }
                     results.Items.Add(stringData);
                 }
 
-
-                // disconnect
-                stringData = "bye";
-                byte[] message = Encoding.ASCII.GetBytes(stringData);
-                client.Send(message);
-                client.Close();
-                results.Items.Add("Connection stopped");
-                ListenButton.Enabled = true;
-                ConnectButton.Enabled = true;
-                DisconnectButton.Enabled = false;
-                isYourTurn = false;
-                TurnLabel.Text = "Game hasn't started yet!";
-
-                newsock.Shutdown(SocketShutdown.Both);
-                receiver.Abort();
-                
-
-                AttackButton.Enabled = false;
-                currentFlagNumber = 0;
+                if(currentFlagNumber > 0)
+                {
+                    // if enemy disconnect or if enemy got captured, enemy will send bye message
+                    // so in both scenerio, remaining one will win the game
+                    results.Items.Add("YOU WON! CONGRATULATIONS");
+                }
+                Disconnect();
                 return;
             }
             catch (Exception)
@@ -251,7 +229,7 @@ namespace CNPHomework
             DisconnectButton.Enabled = false;
             TurnLabel.Text = "Game hasn't started yet!";
 
-            // Control.CheckForIllegalCrossThreadCalls = false;
+            Control.CheckForIllegalCrossThreadCalls = false;
         }
 
         void ButtonConnectOnClick(object obj, EventArgs ea)
@@ -310,7 +288,6 @@ namespace CNPHomework
         {
             AttackButton.Enabled = false;
             SendAttackLocations();
-            TurnLabel.Text = "Enemy Turn";
             SkipTurn();
         }
 
@@ -330,29 +307,52 @@ namespace CNPHomework
             }
         }
 
+        void SkipTurn()
+        {
+            try
+            {
+                byte[] message = Encoding.ASCII.GetBytes("Your Turn!");
+                client.BeginSend(message, 0, message.Length, 0,
+                new AsyncCallback(SendData), client);
+                results.Items.Add("Enemy Turn");
+                TurnLabel.Text = "Enemy Turn";
+            }
+            catch (Exception)
+            {
+                results.Items.Add("Error on skipping the turn");
+            }
+        }
+
         public void GetHitToPosition(int x, int y)
         {
-            Flag hitArea = new Flag(x, y);
-            
-            // this double for loop iterates over the flag's coordinates
-            for (int i = 0; i < hitArea.flagAreaCoordinates.Length; i++)
+            Flag hitArea = new Flag(x,y);
+            foreach (Flag flag in flags)
             {
-                for (int j = 0; j < hitArea.flagAreaCoordinates.Length; j++)
+                // if the flag is NOT already captured
+                if(!flag.isCaptured)
                 {
-                    // this line gets the coordinates info from the coordinate array and draw it to black
-                    try
+                    // if this attack is in one my flags
+                    if (flag.isThisAttackInMyArea(hitArea))
                     {
-                        mapBitMap.SetPixel(hitArea.flagAreaCoordinates[i, j].getX(), hitArea.flagAreaCoordinates[i, j].getX(), Color.Black);
-                    }
-                    catch (Exception)
-                    {
+                        // this finds the spesific flag from the listBox of sewed flags and 
+                        // changes its name into clearer string
+                        int index = ListBoxOfSewedFlags.Items.IndexOf(flag.ToString());
+                        var record = ListBoxOfSewedFlags.Items[index] = flag.ToString() + " (CAPTURED)";
 
-                        MessageBox.Show("Error while drawing the picture");
+
+                        // decrease one of the flags we have, if it reaches 0, the game will be lost
+                        // this way we dont need to use another variable
+                        currentFlagNumber--;
+                        if(currentFlagNumber <= 0)
+                        {
+                            LoseGame();         
+                        }
+
                     }
-                    
                 }
-                
             }
+            
+            
         }
 
         private void AttackText_TextChanged(object sender, EventArgs e)
@@ -366,23 +366,57 @@ namespace CNPHomework
 
         private void DisconnectButton_Click(object sender, EventArgs e)
         {
-            if(client != null)
-            {
-                byte[] message = Encoding.ASCII.GetBytes("bye");
-                client.Send(message);
-                ConnectButton.Enabled = true;
-                ListenButton.Enabled = true;
-            }
-            else
-            {
-                MessageBox.Show("Client is null");
-            }
+            Disconnect();
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void ClearResultsButton_Click(object sender, EventArgs e)
         {
-            byte[] message = Encoding.ASCII.GetBytes("bye");
-            client.Send(message);
+            results.Items.Clear();  
         }
+
+        private void Disconnect()
+        {
+            
+            string stringData = "bye";
+            byte[] message = Encoding.ASCII.GetBytes(stringData);
+            client.Send(message);
+            client.Close();
+            results.Items.Add("Connection stopped");
+
+            // to enable the buttons
+            ListenButton.Enabled = true;
+            ConnectButton.Enabled = true;
+
+            // to enable the button that can close the connection
+            DisconnectButton.Enabled = false;
+            AttackButton.Enabled = false;
+
+            // to make the game like it started
+            currentFlagNumber = 0;
+            isYourTurn = false;
+            TurnLabel.Text = "Game hasn't started yet!";
+
+
+            //if (!newsock.Connected)
+            //{
+            //    newsock.Close();
+            //}
+
+            //if (!receiver.IsAlive)
+            //{
+            //    receiver.Abort();
+            //}
+        }
+
+        private void LoseGame()
+        {
+            // the function that will be used on the state of losing the game
+            // appropriate message will be written in the result box and disconnect
+            results.Items.Add("YOU LOST THE GAME!");
+            Disconnect();
+        }
+
+
+
     }
 }
