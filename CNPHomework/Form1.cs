@@ -225,7 +225,7 @@ namespace CNPHomework
 
             ReadyButton.Enabled = false;
             AttackButton.Enabled = false;
-            AttackText.Enabled = falseA
+            AttackText.Enabled = false;
             DisconnectButton.Enabled = false;
             TurnLabel.Text = "Game hasn't started yet!";
             IpAdressOfEndPointTextBox.Text = "127.0.0.1";
