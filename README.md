@@ -13,7 +13,8 @@ IR_4: A flag represents a certain area. (Example: area of 15 pixels x 15 pixels.
 IR_5: Both players will try to find their respective flags. Finds the flag of the opposing player will be the owner/manager of that region.\
 IR_6: The positions of the flags will remain fixed during the game.
 
-Homework Material:
+Homework Material:\
+
 Mat_1: TCP Protocol structure will be used.\
 Mat_2: In the software on both PCs, the attached map will be used as a visual map for planting flags.\
 Mat_3: C# language on Windows / Mono on Linux can be used.\
