@@ -31,6 +31,7 @@ namespace CNPHomework
         private bool isYourTurn = false;
         private bool AttackPhase = false;
         private bool SewFlagPhase = true;
+        private bool isWin = false;
 
         private void SewFlag(int x, int y)
         {
@@ -42,7 +43,11 @@ namespace CNPHomework
                 
                 currentFlagNumber += 1;
                 flags[currentFlagNumber - 1] = newFlag;
-                results.Items.Add(String.Format("New Flag has been sewed. It's coordinates are: X={0}, Y={1}", x, y));
+
+
+                // results.Items.Add(String.Format("New Flag has been sewed. It's coordinates are: X={0}, Y={1}", x, y));
+                AddToResults(String.Format("New Flag has been sewed. It's coordinates are: X={0}, Y={1}", x, y));
+
                 ListBoxOfSewedFlags.Items.Add(newFlag.ToString());
                 FlagsLeftToSewTextBox.Text = (maxFlagNumberPerPlayer - currentFlagNumber).ToString();
 
@@ -65,7 +70,10 @@ namespace CNPHomework
             {
                 ListenButton.Enabled = false;
                 ConnectButton.Enabled = false;
-                results.Items.Add("Listening for a client...");
+
+                // results.Items.Add("Listening for a client...");
+                AddToResults("Listening for a client...");
+
                 ConnectButton.Enabled = false;
                 newsock = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
                 ProtocolType.Tcp);
@@ -77,7 +85,9 @@ namespace CNPHomework
             }
             catch (Exception)
             {
-                results.Items.Add("Error on listen on click button");
+                // results.Items.Add("Error on listen on click button");
+                AddToResults("Someone is already listening the port. Try again later");
+
                 // if error occurs enable back the connect button
                 ListenButton.Enabled = true;
                 ConnectButton.Enabled = true;
@@ -85,14 +95,16 @@ namespace CNPHomework
             
         }
 
-        
         void AcceptConn(IAsyncResult iar)
         {
             try
             {
                 Socket oldserver = (Socket)iar.AsyncState;
                 client = oldserver.EndAccept(iar);
-                results.Items.Add("Connection from: " + client.RemoteEndPoint.ToString());
+
+                // results.Items.Add("Connection from: " + client.RemoteEndPoint.ToString());
+                AddToResults("Connection from: " + client.RemoteEndPoint.ToString());
+
                 receiver = new Thread(new ThreadStart(ReceiveData));
                 receiver.Start();
 
@@ -105,18 +117,21 @@ namespace CNPHomework
             catch (Exception)
             {
 
-                results.Items.Add("Error accepting the connection");   
+                // results.Items.Add("Error accepting the connection");
+                AddToResults("Error accepting the connection");
             }
             
         }
 
-        
         void Connected(IAsyncResult iar)
         {
             try
             {
                 client.EndConnect(iar);
-                results.Items.Add("Connected to: " + client.RemoteEndPoint.ToString());
+
+                // results.Items.Add("Connected to: " + client.RemoteEndPoint.ToString());
+                AddToResults("Connected to: " + client.RemoteEndPoint.ToString());
+
                 Thread receiver = new Thread(new ThreadStart(ReceiveData));
                 receiver.Start();
 
@@ -130,7 +145,8 @@ namespace CNPHomework
             }
             catch (SocketException)
             {
-                results.Items.Add("Error on connected");
+                // results.Items.Add("Error on connected");
+                AddToResults("There is no such a server to connect");
             }
         }
         void SendData(IAsyncResult iar)
@@ -143,7 +159,8 @@ namespace CNPHomework
             catch (Exception)
             {
 
-                results.Items.Add("Error on sending the data");
+                // results.Items.Add("Error on sending the data");
+                AddToResults("Error on sending the data");
             }
             
         }
@@ -160,9 +177,9 @@ namespace CNPHomework
 
                     // if received string is "bye", it means it's our turn to disconnect and close
                     // so we end the while loop and run the remaning codes outside the while loop
-                    if (stringData == "bye")
+                    if (stringData == "bye" || recv == 0)
                         break;
-
+                        
                     // if received string is "Your Turn!", it means it's our turn
                     else if (stringData == "Your Turn!")
                     {
@@ -198,21 +215,19 @@ namespace CNPHomework
                         GetHitToPosition(x, y);
                         
                     }
-                    results.Items.Add(stringData);
+
+                    // results.Items.Add(stringData);
+                    AddToResults(stringData);
                 }
 
-                if(currentFlagNumber > 0)
-                {
-                    // if enemy disconnect or if enemy got captured, enemy will send bye message
-                    // so in both scenerio, remaining one will win the game
-                    results.Items.Add("YOU WON! CONGRATULATIONS");
-                }
-                Disconnect();
+                EnemyDisconnected();
                 return;
             }
             catch (Exception)
             {
-                results.Items.Add("Error on receiving the data");
+
+                // results.Items.Add("Error on receiving the data");
+                AddToResults("Error on receiving the data");
             }
             
         }
@@ -241,7 +256,9 @@ namespace CNPHomework
 
         void ButtonConnectOnClick(object obj, EventArgs ea)
         {
-            results.Items.Add("Connecting...");
+            // results.Items.Add("Connecting...");
+            AddToResults("Connecting...");
+
             client = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
             ProtocolType.Tcp);
             IPEndPoint iep = new IPEndPoint(IPAddress.Parse(IpAdressOfEndPointTextBox.Text), 9050);
@@ -278,7 +295,8 @@ namespace CNPHomework
             }
             catch (Exception)
             {
-                results.Items.Add("Error on map picture click");
+                // results.Items.Add("Error on map picture click");
+                AddToResults("Error on map picture click");
             }
         }
 
@@ -314,6 +332,10 @@ namespace CNPHomework
             }
         }
 
+
+        /// <summary>
+        /// Skips turn and notifies the the enemy about it
+        /// </summary>
         void SkipTurn()
         {
             try
@@ -321,12 +343,16 @@ namespace CNPHomework
                 byte[] message = Encoding.ASCII.GetBytes("Your Turn!");
                 client.BeginSend(message, 0, message.Length, 0,
                 new AsyncCallback(SendData), client);
-                results.Items.Add("Enemy Turn");
+
+                // results.Items.Add("Enemy Turn");
+                AddToResults("Enemy Turn");
+
                 TurnLabel.Text = "Enemy Turn";
             }
             catch (Exception)
             {
-                results.Items.Add("Error on skipping the turn");
+                // results.Items.Add("Error on skipping the turn");
+                AddToResults("Error on skipping the turn");
             }
         }
 
@@ -373,6 +399,7 @@ namespace CNPHomework
 
         private void DisconnectButton_Click(object sender, EventArgs e)
         {
+            AddToResults("You clicked to Disconnect Button");
             Disconnect();
         }
 
@@ -381,18 +408,20 @@ namespace CNPHomework
             results.Items.Clear();  
         }
 
+
+        /// <summary>
+        /// Disconnects from the game and make the game fresh like it has just started
+        /// </summary>
         private void Disconnect()
         {
-            // if client is not null
-            if(client.Connected)
-            {
-                string stringData = "bye";
-                byte[] message = Encoding.ASCII.GetBytes(stringData);
-                client.Send(message);
-                client.Close();
-            }
-            results.Items.Add("Connection stopped");
 
+            string stringData = "bye";
+            byte[] message = Encoding.ASCII.GetBytes(stringData);
+            if(client != null)
+                client.Send(message);
+
+            AddToResults("Connection stopped");
+            AddToResults("YOU LOST THE GAME!");
             // to enable the buttons
             ListenButton.Enabled = true;
             ConnectButton.Enabled = true;
@@ -403,27 +432,100 @@ namespace CNPHomework
             AttackButton.Enabled = false;
 
             // to make the game like it started
+            ListBoxOfSewedFlags.Items.Clear();
+            FlagsLeftToSewTextBox.Text = (maxFlagNumberPerPlayer - currentFlagNumber).ToString();
+
             currentFlagNumber = 0;
             isYourTurn = false;
             TurnLabel.Text = "Game hasn't started yet!";
 
+        }
 
 
-            // close the socket if it's not closed
-            if (newsock != null)
+        /// <summary>
+        /// After enemy disconnect notification, make the game like it hasn't started yet
+        /// </summary>
+        private void EnemyDisconnected()
+        {
+            // results.Items.Add("Connection stopped");
+            AddToResults("Enemy lost connection. Connection stopped");
+
+            if (isWin)
             {
-                newsock.Close();
+                // if enemy disconnect or if enemy got captured, enemy will send bye message
+                // so in both scenerio, remaining one will win the game
+
+                // results.Items.Add("YOU WON! CONGRATULATIONS");
+                AddToResults("YOU WON! CONGRATULATIONS");
             }
+            // to enable the buttons
+            ListenButton.Enabled = true;
+            ConnectButton.Enabled = true;
+            IpAdressOfEndPointTextBox.ReadOnly = false;
+
+            // to disable the button that can close the connection
+            DisconnectButton.Enabled = false;
+            AttackButton.Enabled = false;
+
+            // to make the game like it started
+            ListBoxOfSewedFlags.Items.Clear();
+            FlagsLeftToSewTextBox.Text = (maxFlagNumberPerPlayer - currentFlagNumber).ToString();
+
+            currentFlagNumber = 0;
+            isYourTurn = false;
+            TurnLabel.Text = "Game hasn't started yet!";
+
+            CloseSockets();
 
         }
 
+        /// <summary>
+        /// Closes the sockets if there is open one
+        /// </summary>
+        private void CloseSockets()
+        {
+            if (newsock != null)
+                newsock.Close();
+            if (client != null)
+                client.Close();
+        }
+
+
+        /// <summary>
+        /// Simulates losing the game by disconnecting from game
+        /// </summary>
         private void LoseGame()
         {
             // the function that will be used on the state of losing the game
             // appropriate message will be written in the result box and disconnect
-            results.Items.Add("YOU LOST THE GAME!");
             Disconnect();
         }
 
+        ///  /// <summary>
+        /// adds the parameter string into Results TestBox and scrolls down
+        /// </summary>
+        /// <param name="String">String to be want to shown on results</param>
+        /// <returns></returns>
+        private void AddToResults(string str)
+        {
+            int rowCount = results.Items.Count + 1;
+            results.Items.Add(rowCount.ToString() + ". " + str);
+            results.SelectedIndex = results.Items.Count - 1;
+            
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                Disconnect();
+            }
+            catch (Exception)
+            {
+                // process ends, nothings is neccessary
+            }
+        }
+
+        
     }
 }

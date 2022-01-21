@@ -264,6 +264,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Computer Network Programming Final Homework";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxOfMap)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
