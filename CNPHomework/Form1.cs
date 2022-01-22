@@ -527,6 +527,8 @@ namespace CNPHomework
             currentFlagNumber = 0;
             isYourTurn = false;
             TurnLabel.Text = "Game hasn't started yet!";
+
+            pictureBoxOfMap.Image = originalMapBitMap;
         }
 
         /// <summary>
@@ -592,13 +594,19 @@ namespace CNPHomework
                             // iosi is abbravation of "index of selected item"
                             int iosi = ListBoxOfSewedFlags.Items.IndexOf(ListBoxOfSewedFlags.SelectedItem);
 
+                            // logs to removing
+                            AddToResults("Removed the flag at: " +
+                                ListBoxOfSewedFlags.SelectedItem.ToString() +
+                                ". Remaning flag is: " + (maxFlagNumberPerPlayer - currentFlagNumber + 1));
+
+
                             // we remove the selected flag from listbox
                             ListBoxOfSewedFlags.Items.Remove(ListBoxOfSewedFlags.SelectedItem);
 
                             // before assigning null we can undraw flag
-                            int x = flags[iosi].GetX();
-                            int y = flags[iosi].GetY();
-                            PaintMap(x, y, "restore");
+                            PaintMap(flags[iosi].GetX(), flags[iosi].GetY(), "restore");
+
+                            
 
                             // we also need to make null the selected flag from array
                             flags[iosi] = null;
@@ -611,6 +619,12 @@ namespace CNPHomework
                                 flags[i] = flags[i + 1];
                                 flags[i + 1] = null;
                             }
+
+                            // to handle crossing regions are decrease, we have draw all the remaining flags
+                            foreach (var flag in flags)
+                                if(flag != null)
+                                    PaintMap(flag.GetX(), flag.GetY(), "flag");
+
 
                             // we have remove the currently sewed flags counter
                             currentFlagNumber--;
@@ -632,16 +646,19 @@ namespace CNPHomework
         {
             var bmp = new Bitmap(pictureBoxOfMap.Image);
 
-            for (int i = x - 50; i < x + 50; i++)
+            for (int i = x - 50; i <= x + 50; i++)
             {
-                for (int j = y - 50; j < y + 50; j++)
+                for (int j = y - 50; j <= y + 50; j++)
                 {
                     if (attackOrFlag == "attack")
                         bmp.SetPixel(i, j, Color.Black);
-                    if (attackOrFlag == "flag")
+                    else if (attackOrFlag == "flag")
                         bmp.SetPixel(i, j, Color.Red);
-                    if (attackOrFlag == "restore")
-                        bmp.SetPixel(x, y, originalMapBitMap.GetPixel(x,y));
+                    else if (attackOrFlag == "restore")
+                    {
+                        bmp.SetPixel(i, j, originalMapBitMap.GetPixel(i, j));
+                    }
+                        
                 }
             }
 
