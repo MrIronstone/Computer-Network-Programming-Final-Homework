@@ -24,6 +24,14 @@ namespace CNPHomework
         private static Thread receiver;
         private static IPEndPoint iep;
 
+        /* to be able to restore original pixel values,
+         I store original form of the picture in a static form,
+         and when form loaded it assigns original form to this variable,
+         so later when i need to original form of picture to restore pixels
+         i use it
+        */
+        Bitmap originalMapBitMap;
+
         private static int maxFlagNumberPerPlayer = 5;
         public int currentFlagNumber = 0;
         private Flag[] flags = new Flag[maxFlagNumberPerPlayer];
@@ -46,6 +54,10 @@ namespace CNPHomework
             {
                 // Create new flag
                 Flag newFlag = new Flag(x, y);
+
+                // draw the appropriate place of the map
+                PaintMap(x, y, "flag");
+
                 // increase current flag
                 currentFlagNumber += 1;
                 // and assign it to apğroriate space
@@ -244,6 +256,8 @@ namespace CNPHomework
         {
             InitializeComponent();
 
+            originalMapBitMap = new Bitmap(pictureBoxOfMap.Image);
+
             FlagsLeftToSewTextBox.Text = (maxFlagNumberPerPlayer - currentFlagNumber).ToString();
             // some buttons need to be disabled when started
             ReadyButton.Enabled = false;
@@ -382,6 +396,8 @@ namespace CNPHomework
         public void GetHitToPosition(int x, int y)
         {
             Flag hitArea = new Flag(x,y);
+
+            PaintMap(x, y, "attack");
             foreach (Flag flag in flags)
             {
                 // if the flag is NOT already captured
@@ -579,6 +595,11 @@ namespace CNPHomework
                             // we remove the selected flag from listbox
                             ListBoxOfSewedFlags.Items.Remove(ListBoxOfSewedFlags.SelectedItem);
 
+                            // before assigning null we can undraw flag
+                            int x = flags[iosi].GetX();
+                            int y = flags[iosi].GetY();
+                            PaintMap(x, y, "restore");
+
                             // we also need to make null the selected flag from array
                             flags[iosi] = null;
 
@@ -606,5 +627,26 @@ namespace CNPHomework
             }
             
         }
+
+        private void PaintMap(int x, int y, string attackOrFlag)
+        {
+            var bmp = new Bitmap(pictureBoxOfMap.Image);
+
+            for (int i = x - 50; i < x + 50; i++)
+            {
+                for (int j = y - 50; j < y + 50; j++)
+                {
+                    if (attackOrFlag == "attack")
+                        bmp.SetPixel(i, j, Color.Black);
+                    if (attackOrFlag == "flag")
+                        bmp.SetPixel(i, j, Color.Red);
+                    if (attackOrFlag == "restore")
+                        bmp.SetPixel(x, y, originalMapBitMap.GetPixel(x,y));
+                }
+            }
+
+            pictureBoxOfMap.Image = bmp;
+        }
+
     }
 }

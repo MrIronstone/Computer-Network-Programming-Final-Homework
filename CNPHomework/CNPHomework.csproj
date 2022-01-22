@@ -87,5 +87,8 @@
   <ItemGroup>
     <None Include="Resources\CNP Final Homework Map.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="originalMapBitMap.bmp" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -40,6 +40,16 @@ namespace CNPHomework
 
         // public Coordinate[,] flagAreaCoordinates;
 
+        public int GetX()
+        {
+            return anchorPointX;
+        }
+
+        public int GetY()
+        {
+            return anchorPointY;
+        }
+
         public Flag(int anchorPointX, int anchorPointY)
         {
             this.anchorPointX = anchorPointX;
