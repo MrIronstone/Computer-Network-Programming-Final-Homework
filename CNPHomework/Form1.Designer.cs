@@ -116,7 +116,7 @@
             this.pictureBoxOfMap.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxOfMap.TabIndex = 6;
             this.pictureBoxOfMap.TabStop = false;
-            this.pictureBoxOfMap.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBoxOfMap_MouseDown);
+            this.pictureBoxOfMap.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ClickOnMap);
             // 
             // FlagsLeftToSewLabel
             // 
@@ -144,6 +144,7 @@
             this.ListBoxOfSewedFlags.Name = "ListBoxOfSewedFlags";
             this.ListBoxOfSewedFlags.Size = new System.Drawing.Size(129, 95);
             this.ListBoxOfSewedFlags.TabIndex = 9;
+            this.ListBoxOfSewedFlags.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxOfSewedFlags_MouseDoubleClick);
             // 
             // FlagsLeftToSewTextBox
             // 
@@ -278,7 +279,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox AttackText;
         private System.Windows.Forms.ListBox results;
-        private System.Drawing.Bitmap mapBitMap;
+        // private System.Drawing.Bitmap mapBitMap;
         private System.Windows.Forms.PictureBox pictureBoxOfMap;
         private System.Windows.Forms.Label FlagsLeftToSewLabel;
         private System.Windows.Forms.Label FlagsSewedLabel;
