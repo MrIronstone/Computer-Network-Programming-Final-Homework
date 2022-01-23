@@ -6,16 +6,7 @@ using System.Threading.Tasks;
 
 namespace CNPHomework
 {
-    internal class Game
-    {
-        private bool isThisFlagCaptured = false;
-        private static int maxPlayer = 2;
-        private static int maxFlagNumber = 10;
-        private Flag[] flags = new Flag[maxFlagNumber];
-
-
-    }
-    class Flag
+    internal class Flag
     {
         //private int size = 101;
         //public int getSize()
@@ -35,8 +26,8 @@ namespace CNPHomework
         //}
 
         public bool isCaptured = false;
-        private int anchorPointX;
-        private int anchorPointY;
+        private readonly int anchorPointX;
+        private readonly int anchorPointY;
 
         // public Coordinate[,] flagAreaCoordinates;
 
@@ -67,7 +58,7 @@ namespace CNPHomework
             //}
         }
         
-        public bool isThisAttackInMyArea(Flag hitArea)
+        public bool İsThisAttackInMyArea(Flag hitArea)
         {
             // this method checks if the flag that has been given by paramater
             if(this.anchorPointX - 50 <= hitArea.anchorPointX + 50 && this.anchorPointX + 50 >= hitArea.anchorPointX - 50)

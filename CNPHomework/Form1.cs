@@ -359,6 +359,14 @@ namespace CNPHomework
                 client.BeginSend(message, 0, message.Length, 0,
                 new AsyncCallback(SendData), client);
                 results.Items.Add("You attacked to: " + AttackText.Text);
+
+                // decipher the coordinates
+                int x = int.Parse(AttackText.Text.Split(',')[0].Split('=')[1]);
+                int y = int.Parse(AttackText.Text.Split(',')[1].Split('=')[1]);
+
+                // paint on map as you attack
+                PaintMap(x, y, "attackTO");
+
             }
             catch (Exception)
             {
@@ -404,13 +412,14 @@ namespace CNPHomework
                 if(!flag.isCaptured)
                 {
                     // if this attack is in one my flags
-                    if (flag.isThisAttackInMyArea(hitArea))
+                    if (flag.İsThisAttackInMyArea(hitArea))
                     {
                         // this finds the spesific flag from the listBox of sewed flags and 
                         // changes its name into clearer string
                         int index = ListBoxOfSewedFlags.Items.IndexOf(flag.ToString());
                         var record = ListBoxOfSewedFlags.Items[index] = flag.ToString() + " (CAPTURED)";
 
+                        PaintMap(flag.GetX(), flag.GetY(), "CAPTURED");
 
                         // decrease one of the flags we have, if it reaches 0, the game will be lost
                         // this way we dont need to use another variable
@@ -536,6 +545,7 @@ namespace CNPHomework
         /// </summary>
         private void LoseGame()
         {
+
             // the function that will be used on the state of losing the game
             // appropriate message will be written in the result box and disconnect
             Disconnect();
@@ -654,6 +664,10 @@ namespace CNPHomework
                         bmp.SetPixel(i, j, Color.Black);
                     else if (attackOrFlag == "flag")
                         bmp.SetPixel(i, j, Color.Red);
+                    else if (attackOrFlag == "CAPTURED")
+                        bmp.SetPixel(i, j, Color.Blue);
+                    else if (attackOrFlag == "attackTO")
+                        bmp.SetPixel(i, j, Color.Green);
                     else if (attackOrFlag == "restore")
                     {
                         bmp.SetPixel(i, j, originalMapBitMap.GetPixel(i, j));
