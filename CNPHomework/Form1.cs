@@ -156,8 +156,6 @@ namespace CNPHomework
                 receiver.Start();
 
                 // to deactive and active the appropriate buttons after connection has been accepted
-                ListenButton.Enabled = false;
-                ConnectButton.Enabled = false;
                 DisconnectButton.Enabled = true;
                 isYourTurn = false;
                 TurnLabel.Text = "Enemy Turn";
@@ -167,6 +165,8 @@ namespace CNPHomework
             {
                 // results.Items.Add("Error on connected");
                 AddToResults("There is no such a server to connect");
+                ListenButton.Enabled = true;
+                ConnectButton.Enabled = true;
             }
         }
         void SendData(IAsyncResult iar)
@@ -203,6 +203,7 @@ namespace CNPHomework
                     // if received string is "Your Turn!", it means it's our turn
                     else if (stringData == "Your Turn!")
                     {
+                        AddToResults("Your Turn!");
                         TurnLabel.Text = "Your Turn!";
                         isYourTurn = true;
 
@@ -230,14 +231,9 @@ namespace CNPHomework
                         int x = int.Parse(attackLoc.Split(',')[0].Split('=')[1]);
                         int y = int.Parse(attackLoc.Split(',')[1].Split('=')[1]);
 
-                        stringData = "Attack Received! " + stringData;
-
                         GetHitToPosition(x, y);
                         
                     }
-
-                    // results.Items.Add(stringData);
-                    AddToResults(stringData);
                 }
 
                 EnemyDisconnected();
@@ -295,6 +291,8 @@ namespace CNPHomework
 
         private void ConnectButton_Click(object sender, EventArgs e)
         {
+            ConnectButton.Enabled = false;
+            ListenButton.Enabled = false;
             ButtonConnectOnClick(sender, e);    
         }
 
@@ -405,6 +403,8 @@ namespace CNPHomework
         {
             Flag hitArea = new Flag(x,y);
 
+            AddToResults("Attack Received!. Location at X=" + x + " ,Y=" + y);
+
             PaintMap(x, y, "attack");
             foreach (Flag flag in flags)
             {
@@ -468,8 +468,8 @@ namespace CNPHomework
             if(client != null)
                 client.Send(message);
 
-            AddToResults("Connection stopped");
             AddToResults("YOU LOST THE GAME!");
+            AddToResults("Connection stopped");
 
             ResetGame();
 
