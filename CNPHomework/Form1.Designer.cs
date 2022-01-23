@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.ConnectButton = new System.Windows.Forms.Button();
             this.ListenButton = new System.Windows.Forms.Button();
@@ -48,6 +49,7 @@
             this.IpAdressOfEndPointTextBox = new System.Windows.Forms.TextBox();
             this.localIpAdressTextBox = new System.Windows.Forms.TextBox();
             this.localIpAdressLabel = new System.Windows.Forms.Label();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxOfMap)).BeginInit();
             this.SuspendLayout();
             // 
@@ -236,6 +238,9 @@
             this.localIpAdressLabel.TabIndex = 19;
             this.localIpAdressLabel.Text = "This Device\'s Local IP Adress:";
             // 
+            // toolTip1
+            // 
+            // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -295,6 +300,7 @@
         private System.Windows.Forms.TextBox IpAdressOfEndPointTextBox;
         private System.Windows.Forms.TextBox localIpAdressTextBox;
         private System.Windows.Forms.Label localIpAdressLabel;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 

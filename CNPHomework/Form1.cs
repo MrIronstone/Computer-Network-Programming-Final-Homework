@@ -169,6 +169,7 @@ namespace CNPHomework
                 ConnectButton.Enabled = true;
             }
         }
+
         void SendData(IAsyncResult iar)
         {
             try
@@ -184,6 +185,7 @@ namespace CNPHomework
             }
             
         }
+
         void ReceiveData()
         {
             try
@@ -372,7 +374,6 @@ namespace CNPHomework
             }
         }
 
-
         /// <summary>
         /// Skips turn and notifies the the enemy about it
         /// </summary>
@@ -412,7 +413,7 @@ namespace CNPHomework
                 if(!flag.isCaptured)
                 {
                     // if this attack is in one my flags
-                    if (flag.İsThisAttackInMyArea(hitArea))
+                    if (flag.IsThisAttackInMyArea(hitArea))
                     {
                         // this finds the spesific flag from the listBox of sewed flags and 
                         // changes its name into clearer string
@@ -456,7 +457,6 @@ namespace CNPHomework
             results.Items.Clear();  
         }
 
-
         /// <summary>
         /// Disconnects from the game and make the game fresh like it has just started
         /// </summary>
@@ -474,7 +474,6 @@ namespace CNPHomework
             ResetGame();
 
         }
-
 
         /// <summary>
         /// After enemy disconnect notification, make the game like it hasn't started yet
@@ -595,8 +594,8 @@ namespace CNPHomework
                     {
                         // After double click, message box pops up. If user selectes yes, this if's block works
                         if (MessageBox.Show("Are you sure you want to remove the flag at " +
-                                            ListBoxOfSewedFlags.SelectedItem.ToString() + "?", "Delete"
-                                            + ListBoxOfSewedFlags.SelectedItem.ToString(),
+                                            ListBoxOfSewedFlags.SelectedItem.ToString() + "?", "REMOVE ("
+                                            + ListBoxOfSewedFlags.SelectedItem.ToString() + ") FLAG?",
                                             MessageBoxButtons.YesNo, MessageBoxIcon.Information)
                             == DialogResult.Yes
                         )
@@ -651,7 +650,12 @@ namespace CNPHomework
             }
             
         }
-
+        /// <summary>
+        /// This function paints the perimeter of the point given as a parameter as specified in the string as a parameter
+        /// </summary>
+        /// <param name="x"> This is the x position of center </param>
+        /// <param name="y"> This is the y position of center </param>
+        /// <param name="attackOrFlag"> This string parameter determines what color to be draw</param>
         private void PaintMap(int x, int y, string attackOrFlag)
         {
             var bmp = new Bitmap(pictureBoxOfMap.Image);

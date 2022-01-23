@@ -57,8 +57,13 @@ namespace CNPHomework
             //    }
             //}
         }
-        
-        public bool İsThisAttackInMyArea(Flag hitArea)
+
+        /// <summary>
+        /// This function determines whether the area of the object given as a parameter intersects with this flag. Returns true if they intersect, false if they do not.
+        /// </summary>
+        /// <param name="hitArea"> This object is an object that represents the hit area. Flag center is hit center</param>
+        /// <returns></returns>
+        public bool IsThisAttackInMyArea(Flag hitArea)
         {
             // this method checks if the flag that has been given by paramater
             if(this.anchorPointX - 50 <= hitArea.anchorPointX + 50 && this.anchorPointX + 50 >= hitArea.anchorPointX - 50)
