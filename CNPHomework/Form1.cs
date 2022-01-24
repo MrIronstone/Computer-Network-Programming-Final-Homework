@@ -41,6 +41,12 @@ namespace CNPHomework
         private bool SewFlagPhase = true;
         private bool isWin = false;
 
+        // properties for handle restore aim
+        private int previousX = 500;
+        private int previousY = 500;
+
+
+
         /// <summary>
         /// This function sews flag to given coordinates if it's possible         
         /// </summary>
@@ -321,7 +327,12 @@ namespace CNPHomework
                 }
                 else if (AttackPhase == true && SewFlagPhase == false && AttackText.Enabled == true)
                 {
+                    PaintMap(previousX, previousY, "restoreAim");
+                    RepaintAllFlags();
                     AttackText.Text = String.Format("X={0}, Y={1}", x, y);
+                    PaintMap(x, y, "aim");
+                    previousX = x;
+                    previousY = y;
                 }
 
             }
@@ -630,9 +641,7 @@ namespace CNPHomework
                             }
 
                             // to handle crossing regions are decrease, we have draw all the remaining flags
-                            foreach (var flag in flags)
-                                if(flag != null)
-                                    PaintMap(flag.GetX(), flag.GetY(), "flag");
+                            RepaintAllFlags();
 
 
                             // we have remove the currently sewed flags counter
@@ -664,18 +673,28 @@ namespace CNPHomework
             {
                 for (int j = y - 50; j <= y + 50; j++)
                 {
-                    if (attackOrFlag == "attack")
-                        bmp.SetPixel(i, j, Color.Black);
-                    else if (attackOrFlag == "flag")
-                        bmp.SetPixel(i, j, Color.Red);
-                    else if (attackOrFlag == "CAPTURED")
-                        bmp.SetPixel(i, j, Color.Blue);
-                    else if (attackOrFlag == "attackTO")
-                        bmp.SetPixel(i, j, Color.Green);
-                    else if (attackOrFlag == "restore")
+                    // this guarantees drawed pixels are within the image and doesnt throw exception
+                    if((i >= 0 && j >= 0) && (i < pictureBoxOfMap.Image.Width && j < pictureBoxOfMap.Image.Height))
                     {
-                        bmp.SetPixel(i, j, originalMapBitMap.GetPixel(i, j));
+                        if (attackOrFlag == "attack")
+                            bmp.SetPixel(i, j, Color.Black);
+                        else if (attackOrFlag == "flag")
+                            bmp.SetPixel(i, j, Color.Red);
+                        else if (attackOrFlag == "CAPTURED")
+                            bmp.SetPixel(i, j, Color.Blue);
+                        else if (attackOrFlag == "attackTO")
+                            bmp.SetPixel(i, j, Color.Green);
+                        else if (attackOrFlag == "aim" && (i == x || j == y))
+                            bmp.SetPixel(i, j, Color.Black);
+                        else if (attackOrFlag == "restoreAim" && (i == x || j == y))
+                            bmp.SetPixel(i, j, originalMapBitMap.GetPixel(i, j));
+                        else if (attackOrFlag == "restore")
+                        {
+                            bmp.SetPixel(i, j, originalMapBitMap.GetPixel(i, j));
+                        }
+
                     }
+                    
                         
                 }
             }
@@ -683,5 +702,14 @@ namespace CNPHomework
             pictureBoxOfMap.Image = bmp;
         }
 
+        /// <summary>
+        /// This function  draw all the remaining flags
+        /// </summary>
+        private void RepaintAllFlags()
+        {
+            foreach (var flag in flags)
+                if (flag != null)
+                    PaintMap(flag.GetX(), flag.GetY(), "flag");
+        }
     }
 }

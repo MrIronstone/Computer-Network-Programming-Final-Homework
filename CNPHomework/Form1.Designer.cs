@@ -238,9 +238,6 @@
             this.localIpAdressLabel.TabIndex = 19;
             this.localIpAdressLabel.Text = "This Device\'s Local IP Adress:";
             // 
-            // toolTip1
-            // 
-            // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
