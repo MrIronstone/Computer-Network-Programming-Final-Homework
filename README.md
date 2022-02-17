@@ -19,3 +19,5 @@ Mat_1: TCP Protocol structure will be used.\
 Mat_2: In the software on both PCs, the attached map will be used as a visual map for planting flags.\
 Mat_3: C# language on Windows / Mono on Linux can be used.\
 Mat_4: The data structures to be used are left flexible for the developer’s choice.
+
+![CNP Final Homework Overview](https://user-images.githubusercontent.com/47990723/154547279-db145734-b78a-47d6-a8ac-fc847b1332b2.png)
